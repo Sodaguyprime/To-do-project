@@ -9,6 +9,9 @@
   --danger: #ff6b6b;
   --warning: #ffd166;
   --shadow: #0b0d12;
+  --prio-low: #66ffc4;   /* mint */
+  --prio-medium: #ffd166;/* amber */
+  --prio-high: #ff6b6b;  /* red */
 }
 
 * {
@@ -137,7 +140,18 @@ body {
   border: 4px solid var(--shadow);
   border-radius: 8px;
   padding: 10px;
+  position: relative;
 }
+
+/* Priority left border: thick, pixel-like */
+.item.p-low { border-left: 12px solid var(--prio-low); }
+.item.p-medium { border-left: 12px solid var(--prio-medium); }
+.item.p-high { border-left: 12px solid var(--prio-high); }
+
+/* Optional extra pixel feel with stepped inset shadows */
+.item.p-low { box-shadow: -12px 0 0 0 var(--prio-low) inset, 0 0 0 4px var(--shadow) inset, 0 6px 0 0 var(--shadow); }
+.item.p-medium { box-shadow: -12px 0 0 0 var(--prio-medium) inset, 0 0 0 4px var(--shadow) inset, 0 6px 0 0 var(--shadow); }
+.item.p-high { box-shadow: -12px 0 0 0 var(--prio-high) inset, 0 0 0 4px var(--shadow) inset, 0 6px 0 0 var(--shadow); }
 
 .checkbox {
   width: 24px;

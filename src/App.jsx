@@ -2,12 +2,21 @@ import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 
 const STORAGE_KEY = 'pixel_todos_v1'
+const PRIORITIES = ['low', 'medium', 'high']
+const nextPriority = (p) => {
+  const i = PRIORITIES.indexOf(p)
+  return PRIORITIES[(i + 1) % PRIORITIES.length]
+}
 
 function usePersistentTodos() {
   const [todos, setTodos] = useState(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY)
-      return raw ? JSON.parse(raw) : []
+      const parsed = raw ? JSON.parse(raw) : []
+      // Migration: ensure priority exists; default to 'low' for old data
+      return Array.isArray(parsed)
+        ? parsed.map(t => ({ ...t, priority: t.priority || 'low' }))
+        : []
     } catch {
       return []
     }
@@ -34,7 +43,7 @@ function App() {
   function addTodo() {
     const value = text.trim()
     if (!value) return
-    const todo = { id: crypto.randomUUID(), text: value, done: false, createdAt: Date.now() }
+    const todo = { id: crypto.randomUUID(), text: value, done: false, priority: 'low', createdAt: Date.now() }
     setTodos([todo, ...todos])
     setText('')
   }
@@ -53,6 +62,10 @@ function App() {
 
   function renameTodo(id, newText) {
     setTodos(todos.map(t => t.id === id ? { ...t, text: newText } : t))
+  }
+
+  function changePriority(id) {
+    setTodos(todos.map(t => t.id === id ? { ...t, priority: nextPriority(t.priority || 'low') } : t))
   }
 
   function onSubmit(e) {
@@ -93,6 +106,7 @@ function App() {
                 onToggle={() => toggleTodo(todo.id)}
                 onDelete={() => deleteTodo(todo.id)}
                 onRename={(v) => renameTodo(todo.id, v)}
+                onChangePriority={() => changePriority(todo.id)}
               />
             ))
           )}
@@ -111,7 +125,7 @@ function App() {
   )
 }
 
-function TodoItem({ todo, onToggle, onDelete, onRename }) {
+function TodoItem({ todo, onToggle, onDelete, onRename, onChangePriority }) {
   const [isEditing, setIsEditing] = useState(false)
   const [draft, setDraft] = useState(todo.text)
 
@@ -121,8 +135,10 @@ function TodoItem({ todo, onToggle, onDelete, onRename }) {
     setIsEditing(false)
   }
 
+  const prioLabel = (todo.priority || 'low').toUpperCase()
+
   return (
-    <div className="item">
+    <div className={`item p-${todo.priority || 'low'}`}>
       <input
         type="checkbox"
         className="checkbox"
@@ -148,6 +164,7 @@ function TodoItem({ todo, onToggle, onDelete, onRename }) {
         </div>
       )}
       <div className="actions">
+        <button className="btn secondary" onClick={onChangePriority} aria-label="Change priority">{prioLabel}</button>
         <button className="btn secondary" onClick={() => setIsEditing(v => !v)}>{isEditing ? 'Save' : 'Edit'}</button>
         <button className="btn danger" onClick={onDelete}>Del</button>
       </div>
