@@ -1,0 +1,11 @@
+{
+  "name": "Pixel Todos",
+  "short_name": "Todos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1b1f28",
+  "theme_color": "#2b2d42",
+  "description": "Single-user pixel-styled todo list",
+  "icons": []
+}
+

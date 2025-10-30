@@ -33,6 +33,8 @@ function App() {
   const [todos, setTodos] = usePersistentTodos()
   const [text, setText] = useState('')
   const [filter, setFilter] = useState('all') // all | active | done
+  const [a2hsEvent, setA2hsEvent] = useState(null)
+  const [showInstall, setShowInstall] = useState(false)
 
   const visibleTodos = useMemo(() => {
     if (filter === 'active') return todos.filter(t => !t.done)
@@ -71,6 +73,27 @@ function App() {
   function onSubmit(e) {
     e.preventDefault()
     addTodo()
+  }
+
+  // Handle Add to Home Screen prompt on supported browsers (Android/Chrome)
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault()
+      setA2hsEvent(e)
+      setShowInstall(true)
+    }
+    window.addEventListener('beforeinstallprompt', handler)
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
+
+  async function confirmInstall() {
+    if (!a2hsEvent) { setShowInstall(false); return }
+    // Show the install prompt
+    await a2hsEvent.prompt()
+    // Optionally, check outcome
+    await a2hsEvent.userChoice.catch(() => {})
+    setShowInstall(false)
+    setA2hsEvent(null)
   }
 
   return (
@@ -121,6 +144,16 @@ function App() {
         </div>
         <button className="btn danger" onClick={clearDone}>Clear Done</button>
       </footer>
+
+      {showInstall && (
+        <div className="panel toolbar" role="dialog" aria-label="Install app">
+          <div className="heading">Install Pixel Todos?</div>
+          <div style={{ display: 'flex', gap: 8, marginLeft: 'auto' }}>
+            <button className="btn" onClick={confirmInstall}>Install</button>
+            <button className="btn secondary" onClick={() => setShowInstall(false)}>Not now</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
