@@ -1,10 +1,35 @@
-import {styles} from "../styles.js";
+import { useState } from 'react';
+import { styles } from "../styles.js";
 
-const Header = ({todos}) => {
+const Header = ({ todos, activeTab, setActiveTab }) => {
+    return (
+        <header style={styles.header}>
+            <h1 style={styles.title}>Pixel Productivity</h1>
 
-    return (<header style={styles.header}>
-        <h1 style={styles.title}>Todos </h1>
-        <div style={styles.countChip}> {todos.filter(t => !t.done).length} Tasks Left</div>
-    </header>)
+            <div style={styles.tabs}>
+                <button
+                    style={{
+                        ...styles.tab,
+                        ...(activeTab === 'todos' ? styles.tabActive : {})
+                    }}
+                    onClick={() => setActiveTab('todos')}
+                >
+                    Todo List
+                    <span style={styles.badge}>{todos.filter(t => !t.done).length}</span>
+                </button>
+
+                <button
+                    style={{
+                        ...styles.tab,
+                        ...(activeTab === 'pomodoro' ? styles.tabActive : {})
+                    }}
+                    onClick={() => setActiveTab('pomodoro')}
+                >
+                    Pomodoro Timer
+                </button>
+            </div>
+        </header>
+    )
 }
+
 export default Header;

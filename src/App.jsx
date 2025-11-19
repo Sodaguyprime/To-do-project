@@ -5,10 +5,9 @@ import ListTodos from "./components/ListTodos.jsx";
 import Footer from "./components/Footer.jsx";
 import Header from "./components/Header.jsx";
 import TodoItem from "./components/TodoCard.jsx";
-
-
 const STORAGE_KEY = 'pixel_todos_v1'
 const PRIORITIES = ['low', 'medium', 'high']
+
 const nextPriority = (p) => {
     const i = PRIORITIES.indexOf(p)
     return PRIORITIES[(i + 1) % PRIORITIES.length]
@@ -40,7 +39,7 @@ function App() {
     const [todos, setTodos] = usePersistentStorage()
     const [text, setText] = useState('')
     const [filter, setFilter] = useState('all')
-
+    const [activeTab, setActiveTab] = useState('todos');
     const visibleTodos = useMemo(() => {
         if (filter === 'active') return todos.filter(t => !t.done)
         if (filter === 'done') return todos.filter(t => t.done)
@@ -83,27 +82,35 @@ function App() {
     return (
 
         <div style={styles.appShell}>
-            <Header todos={todos} />
+            <Header
+                todos={todos}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+            />
+            {activeTab === 'todos' && (
+                <>
+                <section style={styles.panel}>
+                    <AddTodo onSubmit={onSubmit} setText={setText} text={text}/>
+                    <ListTodos visibleTodos={visibleTodos} toggleTodo={toggleTodo}
+                               deleteTodo ={deleteTodo}
+                               renameTodo={ renameTodo}
+                               changePriority = {changePriority}
+                               TodoItem={TodoItem}
+                    />
+                </section>
+                <Footer filter={filter} setFilter={setFilter} clearDone={clearDone} />
+        </>
+            )}
 
-            <section style={styles.panel}>
+            {activeTab === 'pomodoro' && (
+                <div>
+                    <h1> pomodoro coming soon</h1>
+                </div>
+            )}
 
-               <AddTodo onSubmit={onSubmit} setText={setText} text={text}/>
-               <ListTodos visibleTodos={visibleTodos} toggleTodo={toggleTodo}
-                          deleteTodo ={deleteTodo}
-                          renameTodo={ renameTodo}
-                          changePriority = {changePriority}
-                          TodoItem={TodoItem}
-              />
-            </section>
-
-            <Footer filter={filter} setFilter={setFilter} clearDone={clearDone} />
         </div>
     )
 
 }
-
-
-
-
 
 export default App

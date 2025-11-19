@@ -12,6 +12,38 @@ export const styles = {
         fontFamily: '"VT323", monospace',
         color: '#e5e5e5',
     },
+    tabs: {
+        display: 'flex',
+        gap: '8px',
+        marginTop: '16px'
+    },
+    tab: {
+        padding: '8px 16px',
+        background: '#3a3d5c',
+        border: '2px solid #4a4d6c',
+        color: '#e0e0e0',
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+        fontSize: '14px',
+        transition: 'all 0.2s',
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px'
+    },
+    tabActive: {
+        background: '#5a5d7c',
+        borderColor: '#66ffc4',
+        color: '#66ffc4'
+    },
+    badge: {
+        background: '#ff6b6b',
+        color: 'white',
+        padding: '2px 8px',
+        borderRadius: '12px',
+        fontSize: '12px',
+        fontWeight: 'bold'
+    },
     panel: {
         background: '#222734',
         border: '4px solid #2b3242',
