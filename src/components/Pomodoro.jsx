@@ -1,0 +1,255 @@
+import { useState, useEffect, useRef } from 'react'
+
+const styles = {
+    panel: {
+        background: '#222734',
+        border: '4px solid #2b3242',
+        boxShadow: '0 0 0 4px #0b0d12 inset, 0 6px 0 0 #0b0d12',
+        borderRadius: '8px',
+        padding: '24px',
+    },
+    timerDisplay: {
+        fontFamily: '"Press Start 2P", monospace',
+        fontSize: 'clamp(48px, 12vw, 72px)',
+        textAlign: 'center',
+        margin: '32px 0',
+        color: '#66ffc4',
+        textShadow: '0 0 20px rgba(102, 255, 196, 0.5)',
+    },
+    modeLabel: {
+        fontFamily: '"Press Start 2P", monospace',
+        fontSize: '14px',
+        textAlign: 'center',
+        color: '#e5e5e5',
+        textTransform: 'uppercase',
+        marginBottom: '16px',
+    },
+    controls: {
+        display: 'flex',
+        gap: '12px',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        marginTop: '24px',
+    },
+    btnPrimary: {
+        background: '#66ffc4',
+        color: '#121418',
+        border: '4px solid #0b0d12',
+        borderRadius: '8px',
+        padding: '14px 18px',
+        fontFamily: '"Press Start 2P", monospace',
+        fontSize: '14px',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+    },
+    btnSecondary: {
+        background: '#ffd166',
+        color: '#121418',
+        border: '4px solid #0b0d12',
+        borderRadius: '8px',
+        padding: '14px 18px',
+        fontFamily: '"Press Start 2P", monospace',
+        fontSize: '14px',
+        cursor: 'pointer',
+    },
+    btnDanger: {
+        background: '#ff6b6b',
+        color: '#fff',
+        border: '4px solid #0b0d12',
+        borderRadius: '8px',
+        padding: '14px 18px',
+        fontFamily: '"Press Start 2P", monospace',
+        fontSize: '14px',
+        cursor: 'pointer',
+    },
+    stats: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+        gap: '12px',
+        marginTop: '24px',
+    },
+    statCard: {
+        background: '#2b3242',
+        border: '4px solid #0b0d12',
+        borderRadius: '8px',
+        padding: '16px',
+        textAlign: 'center',
+    },
+    statLabel: {
+        fontFamily: '"VT323", monospace',
+        fontSize: '16px',
+        color: '#9aa1ac',
+        marginBottom: '8px',
+    },
+    statValue: {
+        fontFamily: '"Press Start 2P", monospace',
+        fontSize: '24px',
+        color: '#66ffc4',
+    },
+    progressBar: {
+        width: '100%',
+        height: '12px',
+        background: '#0b0d12',
+        border: '4px solid #2b3242',
+        borderRadius: '8px',
+        overflow: 'hidden',
+        marginTop: '16px',
+    },
+    progressFill: {
+        height: '100%',
+        background: 'linear-gradient(90deg, #66ffc4, #4de0a8)',
+        transition: 'width 0.3s ease',
+    }
+}
+
+const WORK_TIME = 25 * 60
+const SHORT_BREAK = 5 * 60
+const LONG_BREAK = 15 * 60
+
+function Pomodoro() {
+    const [mode, setMode] = useState('work') // 'work', 'short', 'long'
+    const [timeLeft, setTimeLeft] = useState(WORK_TIME)
+    const [isRunning, setIsRunning] = useState(false)
+    const [completedPomodoros, setCompletedPomodoros] = useState(0)
+    const intervalRef = useRef(null)
+
+    const totalTime = mode === 'work' ? WORK_TIME : mode === 'short' ? SHORT_BREAK : LONG_BREAK
+    const progress = ((totalTime - timeLeft) / totalTime) * 100
+
+    useEffect(() => {
+        if (isRunning && timeLeft > 0) {
+            intervalRef.current = setInterval(() => {
+                setTimeLeft(prev => {
+                    if (prev <= 1) {
+                        handleTimerComplete()
+                        return 0
+                    }
+                    return prev - 1
+                })
+            }, 1000)
+        } else {
+            clearInterval(intervalRef.current)
+        }
+
+        return () => clearInterval(intervalRef.current)
+    }, [isRunning, timeLeft])
+
+    function handleTimerComplete() {
+        setIsRunning(false)
+
+        if (mode === 'work') {
+            const newCount = completedPomodoros + 1
+            setCompletedPomodoros(newCount)
+
+            // After 4 pomodoros, suggest long break
+            if (newCount % 4 === 0) {
+                setMode('long')
+                setTimeLeft(LONG_BREAK)
+            } else {
+                setMode('short')
+                setTimeLeft(SHORT_BREAK)
+            }
+        } else {
+            setMode('work')
+            setTimeLeft(WORK_TIME)
+        }
+
+        // Play notification sound (browser beep)
+        if (typeof Audio !== 'undefined') {
+            try {
+                const beep = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYHGGm98OScTgwOUKrj8LReGgjh')
+                beep.play().catch(() => {})
+            } catch (e) {}
+        }
+    }
+
+    function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60)
+        const secs = seconds % 60
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+    }
+
+    function toggleTimer() {
+        setIsRunning(!isRunning)
+    }
+
+    function resetTimer() {
+        setIsRunning(false)
+        setTimeLeft(totalTime)
+    }
+
+    function switchMode(newMode) {
+        setIsRunning(false)
+        setMode(newMode)
+        const newTime = newMode === 'work' ? WORK_TIME : newMode === 'short' ? SHORT_BREAK : LONG_BREAK
+        setTimeLeft(newTime)
+    }
+
+    const modeLabel = mode === 'work' ? '🎯 FOCUS TIME' : mode === 'short' ? '☕ SHORT BREAK' : '🌴 LONG BREAK'
+    const modeColor = mode === 'work' ? '#66ffc4' : mode === 'short' ? '#ffd166' : '#ff6b6b'
+
+    return (
+        <div style={styles.panel}>
+            <div style={{...styles.modeLabel, color: modeColor}}>
+                {modeLabel}
+            </div>
+
+            <div style={{...styles.timerDisplay, color: modeColor}}>
+                {formatTime(timeLeft)}
+            </div>
+
+            <div style={styles.progressBar}>
+                <div style={{...styles.progressFill, width: `${progress}%`, background: `linear-gradient(90deg, ${modeColor}, ${modeColor}dd)`}} />
+            </div>
+
+            <div style={styles.controls}>
+                <button
+                    onClick={toggleTimer}
+                    style={styles.btnPrimary}
+                >
+                    {isRunning ? 'PAUSE' : 'START'}
+                </button>
+                <button
+                    onClick={resetTimer}
+                    style={styles.btnSecondary}
+                >
+                    RESET
+                </button>
+            </div>
+
+            <div style={styles.controls}>
+                <button
+                    onClick={() => switchMode('work')}
+                    style={{...styles.btnSecondary, background: mode === 'work' ? '#66ffc4' : '#2b3242', color: mode === 'work' ? '#121418' : '#e5e5e5'}}
+                >
+                    WORK
+                </button>
+                <button
+                    onClick={() => switchMode('short')}
+                    style={{...styles.btnSecondary, background: mode === 'short' ? '#ffd166' : '#2b3242', color: mode === 'short' ? '#121418' : '#e5e5e5'}}
+                >
+                    BREAK
+                </button>
+                <button
+                    onClick={() => switchMode('long')}
+                    style={{...styles.btnSecondary, background: mode === 'long' ? '#ff6b6b' : '#2b3242', color: mode === 'long' ? '#fff' : '#e5e5e5'}}
+                >
+                    LONG
+                </button>
+            </div>
+
+            <div style={styles.stats}>
+                <div style={styles.statCard}>
+                    <div style={styles.statLabel}>Completed</div>
+                    <div style={styles.statValue}>{completedPomodoros}</div>
+                </div>
+                <div style={styles.statCard}>
+                    <div style={styles.statLabel}>Session</div>
+                    <div style={styles.statValue}>{Math.floor(completedPomodoros / 4) + 1}</div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default Pomodoro
