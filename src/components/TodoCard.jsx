@@ -13,6 +13,7 @@ function TodoItem({ todo, onToggle, onDelete, onRename, onChangePriority }) {
     }
 
     const prioLabel = (todo.priority || 'low')[0].toUpperCase()
+
     const prioColor = {
         low: '#66ffc4',
         medium: '#ffd166',

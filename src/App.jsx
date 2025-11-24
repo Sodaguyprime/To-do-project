@@ -5,6 +5,8 @@ import ListTodos from "./components/ListTodos.jsx";
 import Footer from "./components/Footer.jsx";
 import Header from "./components/Header.jsx";
 import TodoItem from "./components/TodoCard.jsx";
+import Pomodoro from "./components/Pomodoro.jsx"
+
 const STORAGE_KEY = 'pixel_todos_v1'
 const PRIORITIES = ['low', 'medium', 'high']
 
@@ -40,6 +42,7 @@ function App() {
     const [text, setText] = useState('')
     const [filter, setFilter] = useState('all')
     const [activeTab, setActiveTab] = useState('todos');
+
     const visibleTodos = useMemo(() => {
         if (filter === 'active') return todos.filter(t => !t.done)
         if (filter === 'done') return todos.filter(t => t.done)
@@ -103,9 +106,7 @@ function App() {
             )}
 
             {activeTab === 'pomodoro' && (
-                <div>
-                    <h1> pomodoro coming soon</h1>
-                </div>
+               <Pomodoro />
             )}
 
         </div>
