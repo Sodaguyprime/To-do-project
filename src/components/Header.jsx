@@ -5,7 +5,7 @@ const Header = ({ todos, activeTab, setActiveTab }) => {
         <header style={styles.header}>
             <div style={styles.headerTop}>
                 <div style={styles.titleSection}>
-                    <img src="/Pomotodo.png" alt="Pomotodo Logo" style={{ width: '15%', height: '15%', objectFit: 'contain' }} />
+                    <img src="/Pomotodo.png" alt="Pomotodo Logo" style={{ width: '10%', height: '10%', objectFit: 'contain' }} />
                     <h1 style={styles.title}>POMOTODO</h1>
                 </div>
             </div>
@@ -18,7 +18,7 @@ const Header = ({ todos, activeTab, setActiveTab }) => {
                     }}
                     onClick={() => setActiveTab('todos')}
                 >
-                    <span>📝 Todos</span>
+                    <span>📝 Todo</span>
                     {todos.filter(t => !t.done).length > 0 && (
                         <span style={styles.badge}>{todos.filter(t => !t.done).length}</span>
                     )}
