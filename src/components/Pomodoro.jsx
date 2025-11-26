@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import WeeklyStats from './weekly-stats-component'
 
 const styles = {
     panel: {
@@ -99,21 +100,40 @@ const styles = {
         height: '100%',
         background: 'linear-gradient(90deg, #66ffc4, #4de0a8)',
         transition: 'width 0.3s ease',
+    },
+    durationSelector: {
+        display: 'flex',
+        gap: '8px',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        marginBottom: '16px',
+    },
+    durationBtn: {
+        background: '#2b3242',
+        color: '#e5e5e5',
+        border: '3px solid #0b0d12',
+        borderRadius: '6px',
+        padding: '10px 16px',
+        fontFamily: '"Press Start 2P", monospace',
+        fontSize: '12px',
+        cursor: 'pointer',
     }
 }
 
-const WORK_TIME = 25 * 60
 const SHORT_BREAK = 5 * 60
 const LONG_BREAK = 15 * 60
+const WORK_DURATIONS = [25, 35, 40, 50] // in minutes
 
 function Pomodoro() {
+    const [workDuration, setWorkDuration] = useState(25) // default 25 minutes
     const [mode, setMode] = useState('work') // 'work', 'short', 'long'
-    const [timeLeft, setTimeLeft] = useState(WORK_TIME)
+    const [timeLeft, setTimeLeft] = useState(workDuration * 60)
     const [isRunning, setIsRunning] = useState(false)
     const [completedPomodoros, setCompletedPomodoros] = useState(0)
+    const [totalStudyMinutes, setTotalStudyMinutes] = useState(0)
     const intervalRef = useRef(null)
 
-    const totalTime = mode === 'work' ? WORK_TIME : mode === 'short' ? SHORT_BREAK : LONG_BREAK
+    const totalTime = mode === 'work' ? workDuration * 60 : mode === 'short' ? SHORT_BREAK : LONG_BREAK
     const progress = ((totalTime - timeLeft) / totalTime) * 100
 
     useEffect(() => {
@@ -141,6 +161,9 @@ function Pomodoro() {
             const newCount = completedPomodoros + 1
             setCompletedPomodoros(newCount)
 
+            // Add completed work session to total study time
+            setTotalStudyMinutes(prev => prev + workDuration)
+
             // After 4 pomodoros, suggest long break
             if (newCount % 4 === 0) {
                 setMode('long')
@@ -151,7 +174,7 @@ function Pomodoro() {
             }
         } else {
             setMode('work')
-            setTimeLeft(WORK_TIME)
+            setTimeLeft(workDuration * 60)
         }
 
         // Play notification sound (browser beep)
@@ -181,8 +204,17 @@ function Pomodoro() {
     function switchMode(newMode) {
         setIsRunning(false)
         setMode(newMode)
-        const newTime = newMode === 'work' ? WORK_TIME : newMode === 'short' ? SHORT_BREAK : LONG_BREAK
+        const newTime = newMode === 'work' ? workDuration * 60 : newMode === 'short' ? SHORT_BREAK : LONG_BREAK
         setTimeLeft(newTime)
+    }
+
+    function changeWorkDuration(minutes) {
+        if (!isRunning) {
+            setWorkDuration(minutes)
+            if (mode === 'work') {
+                setTimeLeft(minutes * 60)
+            }
+        }
     }
 
     const modeLabel = mode === 'work' ? '🎯 FOCUS TIME' : mode === 'short' ? '☕ SHORT BREAK' : '🌴 LONG BREAK'
@@ -193,6 +225,25 @@ function Pomodoro() {
             <div style={{...styles.modeLabel, color: modeColor}}>
                 {modeLabel}
             </div>
+
+            {mode === 'work' && !isRunning && (
+                <div style={styles.durationSelector}>
+                    {WORK_DURATIONS.map(duration => (
+                        <button
+                            key={duration}
+                            onClick={() => changeWorkDuration(duration)}
+                            style={{
+                                ...styles.durationBtn,
+                                background: workDuration === duration ? '#66ffc4' : '#2b3242',
+                                color: workDuration === duration ? '#121418' : '#e5e5e5',
+                                border: workDuration === duration ? '3px solid #0b0d12' : '3px solid #0b0d12'
+                            }}
+                        >
+                            {duration}m
+                        </button>
+                    ))}
+                </div>
+            )}
 
             <div style={{...styles.timerDisplay, color: modeColor}}>
                 {formatTime(timeLeft)}
@@ -213,7 +264,7 @@ function Pomodoro() {
                     onClick={resetTimer}
                     style={styles.btnSecondary}
                 >
-                    RESET
+                    End Session
                 </button>
             </div>
 
@@ -248,6 +299,8 @@ function Pomodoro() {
                     <div style={styles.statValue}>{Math.floor(completedPomodoros / 4) + 1}</div>
                 </div>
             </div>
+
+            <WeeklyStats completedSessions={totalStudyMinutes} />
         </div>
     )
 }

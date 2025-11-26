@@ -23,13 +23,30 @@ function TodoItem({ todo, onToggle, onDelete, onRename, onChangePriority }) {
     return (
         <div style={{...styles.item, borderLeftColor: prioColor}}>
             <div style={styles.itemMain}>
-                <input
-                    type="checkbox"
-                    style={styles.checkbox}
-                    checked={todo.done}
-                    onChange={onToggle}
-                    aria-label={todo.done ? 'Mark as not done' : 'Mark as done'}
-                />
+                <div style={{ position: 'relative', width: '28px', height: '28px', flexShrink: 0 }}>
+                    <input
+                        type="checkbox"
+                        style={styles.checkbox}
+                        checked={todo.done}
+                        onChange={onToggle}
+                        aria-label={todo.done ? 'Mark as not done' : 'Mark as done'}
+                    />
+                    {todo.done && (
+                        <div style={{
+                            position: 'absolute',
+                            top: '65%',
+                            left: '67%',
+                            transform: 'translate(-50%, -50%)',
+                            color: '#66ffc4',
+                            fontSize: '25px',
+                            fontWeight: 'bold',
+                            pointerEvents: 'none',
+                            lineHeight: 1
+                        }}>
+                            ✓
+                        </div>
+                    )}
+                </div>
                 {isEditing ? (
                     <input
                         style={styles.editInput}
