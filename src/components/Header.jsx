@@ -1,10 +1,14 @@
-import { useState } from 'react';
 import { styles } from "../styles.js";
 
 const Header = ({ todos, activeTab, setActiveTab }) => {
     return (
         <header style={styles.header}>
-            <h1 style={styles.title}>Pixel Productivity</h1>
+            <div style={styles.headerTop}>
+                <div style={styles.titleSection}>
+                    <img src="/Pomotodo.png" alt="Pomotodo Logo" style={{ width: '15%', height: '15%', objectFit: 'contain' }} />
+                    <h1 style={styles.title}>POMOTODO</h1>
+                </div>
+            </div>
 
             <div style={styles.tabs}>
                 <button
@@ -14,8 +18,10 @@ const Header = ({ todos, activeTab, setActiveTab }) => {
                     }}
                     onClick={() => setActiveTab('todos')}
                 >
-                    Todo List
-                    <span style={styles.badge}>{todos.filter(t => !t.done).length}</span>
+                    <span>📝 Todos</span>
+                    {todos.filter(t => !t.done).length > 0 && (
+                        <span style={styles.badge}>{todos.filter(t => !t.done).length}</span>
+                    )}
                 </button>
 
                 <button
@@ -25,7 +31,7 @@ const Header = ({ todos, activeTab, setActiveTab }) => {
                     }}
                     onClick={() => setActiveTab('pomodoro')}
                 >
-                    Pomodoro Timer
+                    🍅 Pomodoro
                 </button>
             </div>
         </header>
