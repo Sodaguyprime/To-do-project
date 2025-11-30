@@ -18,7 +18,12 @@ const Header = ({ todos, activeTab, setActiveTab }) => {
                     }}
                     onClick={() => setActiveTab('todos')}
                 >
-                    <span style={{ transform: 'translateY(-2.5px) translateX(4px)'  }}>📝</span>Todo
+                     <img 
+        src="task.png" 
+        alt="Todo icon"
+        style={{ width: '18px', height: '21px',  imageRendering: 'pixelated' ,transform: 'translatex(5px) translateY(-1.5px)'  }}
+    />
+    <span>Todo</span>
                     {todos.filter(t => !t.done).length > 0 && (
                         <span style={styles.badge}>{todos.filter(t => !t.done).length}</span>
                     )}
@@ -31,7 +36,12 @@ const Header = ({ todos, activeTab, setActiveTab }) => {
                     }}
                     onClick={() => setActiveTab('pomodoro')}
                 >
-                    <span style={{ transform: 'translateY(-3px) translateX(3px)'  }}>🍅</span> Pomodoro
+                    <img 
+        src="Pixelated-tomato.png" 
+        alt="Todo icon"
+        style={{ width: '18px', height: '18px',  transform: 'translatex(5px) translateY(-1.5px)'  }}
+    />
+    <span>pomodoro</span>
                 </button>
             </div>
         </header>
