@@ -27,7 +27,7 @@ export const styles = {
         cursor: 'pointer',
         fontFamily: '"Press Start 2P", monospace',
         fontSize: '11px',
-        transition: 'all 0.15s ease',
+        transition: 'all 0.35s ease',
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
@@ -36,6 +36,7 @@ export const styles = {
         borderRadius: '6px',
         boxShadow: '0 0 0 2px #4a4d6c inset, 0 4px 0 0 #0b0d12',
         textTransform: 'uppercase',
+        lineHeight: '1',
     },
     tabActive: {
         background: 'linear-gradient(180deg, #66ffc4 0%, #4de6a8 100%)',
