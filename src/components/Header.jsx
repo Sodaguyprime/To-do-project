@@ -18,7 +18,7 @@ const Header = ({ todos, activeTab, setActiveTab }) => {
                     }}
                     onClick={() => setActiveTab('todos')}
                 >
-                    <span>📝 Todo</span>
+                    <span style={{ transform: 'translateY(-2.5px) translateX(4px)'  }}>📝</span>Todo
                     {todos.filter(t => !t.done).length > 0 && (
                         <span style={styles.badge}>{todos.filter(t => !t.done).length}</span>
                     )}
@@ -31,7 +31,7 @@ const Header = ({ todos, activeTab, setActiveTab }) => {
                     }}
                     onClick={() => setActiveTab('pomodoro')}
                 >
-                    🍅 Pomodoro
+                    <span style={{ transform: 'translateY(-3px) translateX(3px)'  }}>🍅</span> Pomodoro
                 </button>
             </div>
         </header>
