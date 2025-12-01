@@ -81,14 +81,19 @@ function App() {
         e.preventDefault()
         addTodo()
     }
+    
+    const activeTodoCount = useMemo(() => 
+    todos.filter(t => !t.done).length, 
+    [todos]
+)
 
     return (
 
         <div style={styles.appShell}>
             <Header
-                todos={todos}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
+                activeTodoCount={activeTodoCount}
             />
             {activeTab === 'todos' && (
                 <>

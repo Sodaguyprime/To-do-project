@@ -27,7 +27,7 @@ export const styles = {
         cursor: 'pointer',
         fontFamily: '"Press Start 2P", monospace',
         fontSize: '11px',
-        transition: 'all 0.35s ease',
+        transition: 'all 0.15s ease',
         position: 'relative',
         display: 'flex',
         alignItems: 'center',

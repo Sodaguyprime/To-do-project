@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState, memo} from "react";
 import {styles} from "../styles.js";
 
 function TodoItem({ todo, onToggle, onDelete, onRename, onChangePriority }) {
@@ -85,4 +85,4 @@ function TodoItem({ todo, onToggle, onDelete, onRename, onChangePriority }) {
         </div>
     )
 }
-export default TodoItem;
+export default TodoItem;   
