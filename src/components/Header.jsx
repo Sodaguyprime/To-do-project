@@ -1,6 +1,7 @@
 import { styles } from "../styles.js";
+import { memo } from "react";
 
-const Header = ({ todos, activeTab, setActiveTab }) => {
+const Header = ({activeTab, setActiveTab, activeTodoCount }) => {
     return (
         <header style={styles.header}>
             <div style={styles.headerTop}>
@@ -24,9 +25,11 @@ const Header = ({ todos, activeTab, setActiveTab }) => {
         style={{ width: '18px', height: '21px',  imageRendering: 'pixelated' ,transform: 'translatex(5px) translateY(-1.5px)'  }}
     />
     <span>Todo</span>
-                    {todos.filter(t => !t.done).length > 0 && (
-                        <span style={styles.badge}>{todos.filter(t => !t.done).length}</span>
-                    )}
+
+                    {activeTodoCount > 0 && (
+    <span style={styles.badge}>{activeTodoCount}</span>
+
+)}
                 </button>
 
                 <button

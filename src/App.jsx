@@ -42,7 +42,7 @@ function App() {
     const [text, setText] = useState('')
     const [filter, setFilter] = useState('all')
     const [activeTab, setActiveTab] = useState('todos');
-
+    const [selectedPriority, setSelectedPriority] = useState('low')
     const visibleTodos = useMemo(() => {
         if (filter === 'active') return todos.filter(t => !t.done)
         if (filter === 'done') return todos.filter(t => t.done)
@@ -52,9 +52,10 @@ function App() {
     function addTodo() {
         const value = text.trim()
         if (!value) return
-        const todo = { id: crypto.randomUUID(), text: value, done: false, priority: 'low', createdAt: Date.now() }
+        const todo = { id: crypto.randomUUID(), text: value, done: false, priority: selectedPriority, createdAt: Date.now() }
         setTodos([todo, ...todos])
         setText('')
+        setSelectedPriority('low')
     }
 
     function toggleTodo(id) {
@@ -81,24 +82,31 @@ function App() {
         e.preventDefault()
         addTodo()
     }
+    
+    const activeTodoCount = useMemo(() => 
+    todos.filter(t => !t.done).length, 
+    [todos]
+)
 
     return (
 
         <div style={styles.appShell}>
             <Header
-                todos={todos}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
+                activeTodoCount={activeTodoCount}
             />
             {activeTab === 'todos' && (
                 <>
                 <section style={styles.panel}>
-                    <AddTodo onSubmit={onSubmit} setText={setText} text={text}/>
+                    <AddTodo onSubmit={onSubmit} setText={setText} text={text}   setSelectedPriority={setSelectedPriority}
+                               selectedPriority={selectedPriority}/>
                     <ListTodos visibleTodos={visibleTodos} toggleTodo={toggleTodo}
                                deleteTodo ={deleteTodo}
                                renameTodo={ renameTodo}
                                changePriority = {changePriority}
                                TodoItem={TodoItem}
+                             
                     />
                 </section>
                 <Footer filter={filter} setFilter={setFilter} clearDone={clearDone} />
