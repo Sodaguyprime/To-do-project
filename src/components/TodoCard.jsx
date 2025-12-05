@@ -6,42 +6,52 @@ function TodoItem({ todo, onToggle, onDelete, onRename, onChangePriority}) {
     const [draft, setDraft] = useState(todo.text)
     const [showActions, setShowActions] = useState(false)
 
-const [touchStart, setTouchStart] = useState(0)
-const [touchEnd, setTouchEnd] = useState(0)
-const [swiping, setSwiping] = useState(false)
-const [swipeDistance, setSwipeDistance] = useState(0)
+    const [touchStart, setTouchStart] = useState(0)
+    const [touchEnd, setTouchEnd] = useState(0)
+    const [swiping, setSwiping] = useState(false)
+    const [swipeDistance, setSwipeDistance] = useState(0)
 
 
-function handleTouchStart(e) {
-    if (!todo.done) return // Only allow swipe on completed tasks
-    setTouchStart(e.targetTouches[0].clientX)
-    setSwiping(true)
-}
-
-function handleTouchMove(e) {
-    if (!todo.done) return
-    const currentTouch = e.targetTouches[0].clientX
-    const distance = touchStart - currentTouch
-    if (distance > 0) { // Only allow left swipe
-        setSwipeDistance(distance)
-        setTouchEnd(currentTouch)
+    function handleTouchStart(e) {
+        if (!todo.done) return // Only allow swipe on completed tasks
+        setTouchStart(e.targetTouches[0].clientX)
+        setTouchEnd(e.targetTouches[0].clientX) // Initialize touchEnd
+        setSwiping(false) // Not swiping yet
+        setSwipeDistance(0)
     }
-}
 
-function handleTouchEnd() {
-    if (!todo.done) return
-    const swipeThreshold = 100 // Minimum swipe distance to trigger delete
-    
-    if (touchStart - touchEnd > swipeThreshold) {
-        onDelete() // Delete the task
+    function handleTouchMove(e) {
+        if (!todo.done) return
+        const currentTouch = e.targetTouches[0].clientX
+        const distance = touchStart - currentTouch
+        
+        // Only consider it a swipe if moved more than 10px
+        if (Math.abs(distance) > 10) {
+            setSwiping(true)
+        }
+        
+        if (distance > 0) { // Only allow left swipe
+            setSwipeDistance(distance)
+            setTouchEnd(currentTouch)
+        }
     }
-    
-    // Reset swipe state
-    setSwiping(false)
-    setSwipeDistance(0)
-    setTouchStart(0)
-    setTouchEnd(0)
-}
+
+    function handleTouchEnd() {
+        if (!todo.done) return
+        const swipeThreshold = 100 // Minimum swipe distance to trigger delete
+        const actualSwipeDistance = touchStart - touchEnd
+        
+        // Only delete if it was actually a swipe (not just a tap)
+        if (swiping && actualSwipeDistance > swipeThreshold) {
+            onDelete() // Delete the task
+        }
+        
+        // Reset swipe state
+        setSwiping(false)
+        setSwipeDistance(0)
+        setTouchStart(0)
+        setTouchEnd(0)
+    }
 
     function submitEdit() {
         const v = draft.trim()
@@ -59,33 +69,33 @@ function handleTouchEnd() {
 
     return (
       <div 
-    style={{
-        ...styles.item, 
-        borderLeftColor: prioColor,
-        transform: swiping ? `translateX(-${Math.min(swipeDistance, 150)}px)` : 'translateX(0)',
-        transition: swiping ? 'none' : 'transform 0.3s ease',
-        opacity: swiping ? Math.max(1 - (swipeDistance / 150), 0.3) : 1,
-        position: 'relative'
-    }}
-    onTouchStart={handleTouchStart}
-    onTouchMove={handleTouchMove}
-    onTouchEnd={handleTouchEnd}
->
-    {todo.done && swiping && swipeDistance > 50 && (
-    <div style={{
-        position: 'absolute',
-        right: '12px',
-        top: '50%',
-        transform: 'translateY(-50%)',
-        color: '#ff6b6b',
-        fontSize: '24px',
-        fontWeight: 'bold',
-        pointerEvents: 'none',
-        opacity: Math.min(swipeDistance / 100, 1)
-    }}>
-        🗑️
-    </div>
-)}
+        style={{
+            ...styles.item, 
+            borderLeftColor: prioColor,
+            transform: swiping ? `translateX(-${Math.min(swipeDistance, 150)}px)` : 'translateX(0)',
+            transition: swiping ? 'none' : 'transform 0.3s ease',
+            opacity: swiping ? Math.max(1 - (swipeDistance / 150), 0.3) : 1,
+            position: 'relative'
+        }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+    >
+        {todo.done && swiping && swipeDistance > 50 && (
+            <div style={{
+                position: 'absolute',
+                right: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#ff6b6b',
+                fontSize: '24px',
+                fontWeight: 'bold',
+                pointerEvents: 'none',
+                opacity: Math.min(swipeDistance / 100, 1)
+            }}>
+                🗑️
+            </div>
+        )}
             <div style={styles.itemMain}>
                 <div style={{ position: 'relative', width: '28px', height: '28px', flexShrink: 0 }}>
                     <input
@@ -149,4 +159,4 @@ function handleTouchEnd() {
         </div>
     )
 }
-export default memo(TodoItem);   
+export default memo(TodoItem);
