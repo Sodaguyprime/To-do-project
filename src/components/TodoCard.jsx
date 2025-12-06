@@ -78,13 +78,15 @@ const [showDeadlineModal, setShowDeadlineModal] = useState(false)
             transition: swiping ? 'none' : 'transform 0.3s ease',
             opacity: swiping ? Math.max(1 - (swipeDistance / 150), 0.3) : 1,
             position: 'relative',
-            paddingTop: (todo.deadline && !todo.done) ? '40px' : '12px'
+            // The original logic for paddingTop based on deadline is being removed 
+            // since DeadlineDisplay is no longer absolutely positioned at the top right.
+            paddingTop: '12px' 
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
     >
-        {!todo.done && <DeadlineDisplay deadline={todo.deadline} />}
+        {/* Removed the absolutely positioned DeadlineDisplay here */}
         {todo.done && swiping && swipeDistance > 50 && (
             <div style={{
                 position: 'absolute',
@@ -102,6 +104,7 @@ const [showDeadlineModal, setShowDeadlineModal] = useState(false)
         )}
             <div style={styles.itemMain}>
                 <div style={{ position: 'relative', width: '28px', height: '28px', flexShrink: 0 }}>
+                    {/* Checkbox */}
                     <input
                         type="checkbox"
                         style={styles.checkbox}
@@ -109,6 +112,7 @@ const [showDeadlineModal, setShowDeadlineModal] = useState(false)
                         onChange={onToggle}
                         aria-label={todo.done ? 'Mark as not done' : 'Mark as done'}
                     />
+                    
                     {todo.done && (
                         <div style={{
                             position: 'absolute',
@@ -125,6 +129,18 @@ const [showDeadlineModal, setShowDeadlineModal] = useState(false)
                         </div>
                     )}
                 </div>
+
+                {/* PRIORITY BUTTON: Moved here, right after the checkbox */}
+                <button
+                    style={{...styles.prioBtn, background: prioColor, marginRight: '0px', transform: 'translateY(3.2px)'
+                        
+                    }} // Added margin for spacing
+                    onClick={onChangePriority}
+                    aria-label="Change priority"
+                >
+                    {prioLabel}
+                </button>
+                
                 {isEditing ? (
                     <input
                         style={styles.editInput}
@@ -145,13 +161,10 @@ const [showDeadlineModal, setShowDeadlineModal] = useState(false)
                         {todo.text}
                     </div>
                 )}
-                <button
-                    style={{...styles.prioBtn, background: prioColor}}
-                    onClick={onChangePriority}
-                    aria-label="Change priority"
-                >
-                    {prioLabel}
-                </button>
+                
+                {/* DEADLINE DISPLAY: Moved here, replacing the original priority button position */}
+                {!todo.done && <DeadlineDisplay deadline={todo.deadline} />}
+
             </div>
 
             {showActions && !isEditing && (

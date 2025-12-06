@@ -26,18 +26,18 @@ const DeadlineDisplay = ({ deadline }) => {
         displayText = 'TOMORROW';
         color = '#ffd166';
     } else {
-        displayText = `${diffDays}D`;
+        displayText = `${diffDays} Days `;
         if (diffDays <= 3) color = '#ffd166';
     }
 
     return (
         <div style={{
             position: 'absolute',
-            top: '4px',
-            right: '1px',
-            fontSize: '8px',
+            top: '5px',
+            right: '0.5px',
+            fontSize: '10px',
             fontWeight: 'bold',
-            padding: '10px 5px',
+            padding: '15px 10px',
             borderRadius: '6px',
             background: color,
             color: '#121418',
