@@ -87,6 +87,9 @@ function App() {
     todos.filter(t => !t.done).length, 
     [todos]
 )
+const setDeadline = (id, deadline) => {
+    setTodos(todos.map(t => t.id === id ? { ...t, deadline } : t));
+};
 
     return (
 
@@ -106,6 +109,7 @@ function App() {
                                renameTodo={ renameTodo}
                                changePriority = {changePriority}
                                TodoItem={TodoItem}
+                               setDeadline={setDeadline}
                              
                     />
                 </section>
