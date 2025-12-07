@@ -1,7 +1,9 @@
 import {useState, memo} from "react";
 import {styles} from "../styles.js";
+import DeadlineModal from './DeadlineModal.jsx'
+import DeadlineDisplay from './DeadlineDisplay.jsx'
 
-function TodoItem({ todo, onToggle, onDelete, onRename, onChangePriority}) {
+function TodoItem({ todo, onToggle, onDelete, onRename, onChangePriority, onSetDeadline}) {
     const [isEditing, setIsEditing] = useState(false)
     const [draft, setDraft] = useState(todo.text)
     const [showActions, setShowActions] = useState(false)
@@ -10,7 +12,7 @@ function TodoItem({ todo, onToggle, onDelete, onRename, onChangePriority}) {
     const [touchEnd, setTouchEnd] = useState(0)
     const [swiping, setSwiping] = useState(false)
     const [swipeDistance, setSwipeDistance] = useState(0)
-
+const [showDeadlineModal, setShowDeadlineModal] = useState(false)
 
     function handleTouchStart(e) {
         if (!todo.done) return // Only allow swipe on completed tasks
@@ -75,12 +77,16 @@ function TodoItem({ todo, onToggle, onDelete, onRename, onChangePriority}) {
             transform: swiping ? `translateX(-${Math.min(swipeDistance, 150)}px)` : 'translateX(0)',
             transition: swiping ? 'none' : 'transform 0.3s ease',
             opacity: swiping ? Math.max(1 - (swipeDistance / 150), 0.3) : 1,
-            position: 'relative'
+            position: 'relative',
+            // The original logic for paddingTop based on deadline is being removed 
+            // since DeadlineDisplay is no longer absolutely positioned at the top right.
+            paddingTop: '12px' 
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
     >
+        {/* Removed the absolutely positioned DeadlineDisplay here */}
         {todo.done && swiping && swipeDistance > 50 && (
             <div style={{
                 position: 'absolute',
@@ -98,6 +104,7 @@ function TodoItem({ todo, onToggle, onDelete, onRename, onChangePriority}) {
         )}
             <div style={styles.itemMain}>
                 <div style={{ position: 'relative', width: '28px', height: '28px', flexShrink: 0 }}>
+                    {/* Checkbox */}
                     <input
                         type="checkbox"
                         style={styles.checkbox}
@@ -105,6 +112,7 @@ function TodoItem({ todo, onToggle, onDelete, onRename, onChangePriority}) {
                         onChange={onToggle}
                         aria-label={todo.done ? 'Mark as not done' : 'Mark as done'}
                     />
+                    
                     {todo.done && (
                         <div style={{
                             position: 'absolute',
@@ -121,6 +129,18 @@ function TodoItem({ todo, onToggle, onDelete, onRename, onChangePriority}) {
                         </div>
                     )}
                 </div>
+
+                {/* PRIORITY BUTTON: Moved here, right after the checkbox */}
+                <button
+                    style={{...styles.prioBtn, background: prioColor, marginRight: '0px', transform: 'translateY(3.2px)'
+                        
+                    }} // Added margin for spacing
+                    onClick={onChangePriority}
+                    aria-label="Change priority"
+                >
+                    {prioLabel}
+                </button>
+                
                 {isEditing ? (
                     <input
                         style={styles.editInput}
@@ -141,22 +161,35 @@ function TodoItem({ todo, onToggle, onDelete, onRename, onChangePriority}) {
                         {todo.text}
                     </div>
                 )}
-                <button
-                    style={{...styles.prioBtn, background: prioColor}}
-                    onClick={onChangePriority}
-                    aria-label="Change priority"
-                >
-                    {prioLabel}
-                </button>
+                
+                {/* DEADLINE DISPLAY: Moved here, replacing the original priority button position */}
+                {!todo.done && <DeadlineDisplay deadline={todo.deadline} />}
+
             </div>
 
             {showActions && !isEditing && (
                 <div style={styles.actions}>
                     <button style={styles.btnSecondary} onClick={() => { setIsEditing(true); setShowActions(false); }}>Edit</button>
+                    <button 
+    style={{
+        ...styles.btnSecondary,
+        background: '#ffd166'
+    }}
+    onClick={() => { setShowDeadlineModal(true); setShowActions(false); }}
+>
+    {todo.deadline ? '📅 Change' : '📅 Set'}
+</button>
                     <button style={styles.btnDanger} onClick={onDelete}>Delete</button>
                 </div>
             )}
+            <DeadlineModal
+    isOpen={showDeadlineModal}
+    onClose={() => setShowDeadlineModal(false)}
+    onSave={onSetDeadline}
+    currentDeadline={todo.deadline}
+/>
         </div>
+        
     )
 }
 export default memo(TodoItem);

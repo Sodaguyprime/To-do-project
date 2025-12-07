@@ -11,6 +11,7 @@ export const styles = {
         background: 'repeating-linear-gradient(0deg, #1b1f28, #1b1f28 4px, #171a22 4px, #171a22 8px)',
         fontFamily: '"VT323", monospace',
         color: '#e5e5e5',
+        margin: '0 auto',
     },
     tabs: {
         display: 'flex',
@@ -211,11 +212,11 @@ export const styles = {
         color: '#9aa1ac',
     },
     prioBtn: {
-        width: '36px',
-        height: '36px',
+        width: '30px',
+        height: '30px',
         flexShrink: 0,
-        border: '4px solid #0b0d12',
-        borderRadius: '8px',
+        border: '2px solid #0b0d12',
+        borderRadius: '5px',
         fontFamily: '"Press Start 2P", monospace',
         fontSize: '12px',
         cursor: 'pointer',

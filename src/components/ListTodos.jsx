@@ -1,6 +1,6 @@
 import {styles} from '../styles'
 import TodoItem from './TodoCard.jsx'
-const ListTodos = ({visibleTodos, toggleTodo, deleteTodo,renameTodo,changePriority, TodoItem}) => {
+const ListTodos = ({visibleTodos, toggleTodo, deleteTodo,renameTodo,changePriority, TodoItem, setDeadline}) => {
     const priorityOrder = { high: 1, medium: 2, low: 3 };
 
     return (
@@ -19,6 +19,7 @@ const ListTodos = ({visibleTodos, toggleTodo, deleteTodo,renameTodo,changePriori
                             onDelete={() => deleteTodo(todo.id)}
                             onRename={(v) => renameTodo(todo.id, v)}
                             onChangePriority={() => changePriority(todo.id)}
+                            onSetDeadline={(deadline) => setDeadline(todo.id, deadline)}
                         />
                     ))
                 )}

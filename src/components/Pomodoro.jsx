@@ -124,67 +124,62 @@ const SHORT_BREAK = 5 * 60
 const LONG_BREAK = 15 * 60
 const WORK_DURATIONS = [25, 35, 40, 50] // in minutes
 
-function Pomodoro() {
-    const [workDuration, setWorkDuration] = useState(25) // default 25 minutes
-    const [mode, setMode] = useState('work') // 'work', 'short', 'long'
-    const [timeLeft, setTimeLeft] = useState(workDuration * 60)
-    const [isRunning, setIsRunning] = useState(false)
-    const [completedPomodoros, setCompletedPomodoros] = useState(0)
-    const [totalStudyMinutes, setTotalStudyMinutes] = useState(0)
+function Pomodoro({ pomodoroState, setPomodoroState }) {
+    
+   const { workDuration, mode, timeLeft, isRunning, completedPomodoros, totalStudyMinutes } = pomodoroState
     const intervalRef = useRef(null)
+   
 
     const totalTime = mode === 'work' ? workDuration * 60 : mode === 'short' ? SHORT_BREAK : LONG_BREAK
     const progress = ((totalTime - timeLeft) / totalTime) * 100
 
     useEffect(() => {
-        if (isRunning && timeLeft > 0) {
-            intervalRef.current = setInterval(() => {
-                setTimeLeft(prev => {
-                    if (prev <= 1) {
-                        handleTimerComplete()
-                        return 0
-                    }
-                    return prev - 1
-                })
-            }, 1000)
-        } else {
-            clearInterval(intervalRef.current)
-        }
-
-        return () => clearInterval(intervalRef.current)
-    }, [isRunning, timeLeft])
-
-    function handleTimerComplete() {
-        setIsRunning(false)
-
-        if (mode === 'work') {
-            const newCount = completedPomodoros + 1
-            setCompletedPomodoros(newCount)
-
-            // Add completed work session to total study time
-            setTotalStudyMinutes(prev => prev + workDuration)
-
-            // After 4 pomodoros, suggest long break
-            if (newCount % 4 === 0) {
-                setMode('long')
-                setTimeLeft(LONG_BREAK)
-            } else {
-                setMode('short')
-                setTimeLeft(SHORT_BREAK)
-            }
-        } else {
-            setMode('work')
-            setTimeLeft(workDuration * 60)
-        }
-
-        // Play notification sound (browser beep)
-        if (typeof Audio !== 'undefined') {
-            try {
-                const beep = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYHGGm98OScTgwOUKrj8LReGgjh')
-                beep.play().catch(() => {})
-            } catch (e) {}
-        }
+    if (isRunning && timeLeft > 0) {
+        intervalRef.current = setInterval(() => {
+            setPomodoroState(prev => {
+                if (prev.timeLeft <= 1) {
+                    handleTimerComplete(prev)
+                    return { ...prev, timeLeft: 0, isRunning: false }
+                }
+                return { ...prev, timeLeft: prev.timeLeft - 1 }
+            })
+        }, 1000)
+    } else {
+        clearInterval(intervalRef.current)
     }
+
+    return () => clearInterval(intervalRef.current)
+}, [isRunning, timeLeft])
+
+    function handleTimerComplete(state) {
+    const newState = { ...state, isRunning: false }
+
+    if (state.mode === 'work') {
+        const newCount = state.completedPomodoros + 1
+        newState.completedPomodoros = newCount
+        newState.totalStudyMinutes = state.totalStudyMinutes + state.workDuration
+
+        if (newCount % 4 === 0) {
+            newState.mode = 'long'
+            newState.timeLeft = LONG_BREAK
+        } else {
+            newState.mode = 'short'
+            newState.timeLeft = SHORT_BREAK
+        }
+    } else {
+        newState.mode = 'work'
+        newState.timeLeft = state.workDuration * 60
+    }
+
+    setPomodoroState(newState)
+
+    if (typeof Audio !== 'undefined') {
+        try {
+            const beep = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYHGGm98OScTgwOUKrj8LReGgjh')
+            beep.play().catch(() => {})
+        } catch (e) {}
+    }
+}
 
     function formatTime(seconds) {
         const mins = Math.floor(seconds / 60)
@@ -193,29 +188,27 @@ function Pomodoro() {
     }
 
     function toggleTimer() {
-        setIsRunning(!isRunning)
-    }
+    setPomodoroState(prev => ({ ...prev, isRunning: !prev.isRunning }))
+}
 
-    function resetTimer() {
-        setIsRunning(false)
-        setTimeLeft(totalTime)
-    }
+function resetTimer() {
+    setPomodoroState(prev => ({ ...prev, isRunning: false, timeLeft: totalTime }))
+}
 
-    function switchMode(newMode) {
-        setIsRunning(false)
-        setMode(newMode)
-        const newTime = newMode === 'work' ? workDuration * 60 : newMode === 'short' ? SHORT_BREAK : LONG_BREAK
-        setTimeLeft(newTime)
-    }
+function switchMode(newMode) {
+    const newTime = newMode === 'work' ? workDuration * 60 : newMode === 'short' ? SHORT_BREAK : LONG_BREAK
+    setPomodoroState(prev => ({ ...prev, isRunning: false, mode: newMode, timeLeft: newTime }))
+}
 
-    function changeWorkDuration(minutes) {
-        if (!isRunning) {
-            setWorkDuration(minutes)
-            if (mode === 'work') {
-                setTimeLeft(minutes * 60)
-            }
-        }
+function changeWorkDuration(minutes) {
+    if (!isRunning) {
+        setPomodoroState(prev => ({
+            ...prev,
+            workDuration: minutes,
+            timeLeft: prev.mode === 'work' ? minutes * 60 : prev.timeLeft
+        }))
     }
+}
 
     const modeLabel = mode === 'work' ? '🎯 FOCUS TIME' : mode === 'short' ? '☕ SHORT BREAK' : '🌴 LONG BREAK'
     const modeColor = mode === 'work' ? '#66ffc4' : mode === 'short' ? '#ffd166' : '#ff6b6b'

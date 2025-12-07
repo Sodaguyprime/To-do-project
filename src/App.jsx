@@ -43,6 +43,14 @@ function App() {
     const [filter, setFilter] = useState('all')
     const [activeTab, setActiveTab] = useState('todos');
     const [selectedPriority, setSelectedPriority] = useState('low')
+    const [pomodoroState, setPomodoroState] = useState({
+    workDuration: 25,
+    mode: 'work',
+    timeLeft: 25 * 60,
+    isRunning: false,
+    completedPomodoros: 0,
+    totalStudyMinutes: 0
+})
     const visibleTodos = useMemo(() => {
         if (filter === 'active') return todos.filter(t => !t.done)
         if (filter === 'done') return todos.filter(t => t.done)
@@ -87,6 +95,9 @@ function App() {
     todos.filter(t => !t.done).length, 
     [todos]
 )
+const setDeadline = (id, deadline) => {
+    setTodos(todos.map(t => t.id === id ? { ...t, deadline } : t));
+};
 
     return (
 
@@ -106,6 +117,7 @@ function App() {
                                renameTodo={ renameTodo}
                                changePriority = {changePriority}
                                TodoItem={TodoItem}
+                               setDeadline={setDeadline}
                              
                     />
                 </section>
@@ -113,9 +125,12 @@ function App() {
         </>
             )}
 
-            {activeTab === 'pomodoro' && (
-               <Pomodoro />
-            )}
+           {activeTab === 'pomodoro' && (
+   <Pomodoro 
+       pomodoroState={pomodoroState}
+       setPomodoroState={setPomodoroState}
+   />
+)}
 
         </div>
     )
