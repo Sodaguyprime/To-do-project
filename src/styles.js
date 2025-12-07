@@ -11,6 +11,7 @@ export const styles = {
         background: 'repeating-linear-gradient(0deg, #1b1f28, #1b1f28 4px, #171a22 4px, #171a22 8px)',
         fontFamily: '"VT323", monospace',
         color: '#e5e5e5',
+        margin: '0 auto',
     },
     tabs: {
         display: 'flex',

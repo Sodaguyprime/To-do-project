@@ -2,10 +2,26 @@ import { styles } from "../styles.js";
 import { memo } from "react";
 
 const Header = ({activeTab, setActiveTab, activeTodoCount }) => {
+     const catStyle = {
+        position: 'absolute',
+        top: 0,
+        left: '50%',
+        transform: 'translate(-225px, 100%) scalex(-1)',
+        width: '50px',
+        height: 'auto',
+        zIndex: 10,
+        pointerEvents: 'none',
+        imageRendering: 'pixelated'
+    }
     return (
-        <header style={styles.header}>
+        <header style={{...styles.header, position: 'relative'}}>
+            <img 
+                src="/poppingcat.gif" 
+                alt="Cat"
+                style={catStyle}
+            />
             <div style={styles.headerTop}>
-                <div style={styles.titleSection}>
+                <div style={{...styles.titleSection, transform: 'translate(25%, 0%)'}}>
                     <img src="/Pomotodo.png" alt="Pomotodo Logo" style={{ width: '10%', height: '10%', objectFit: 'contain' }} />
                     <h1 style={styles.title}>POMOTODO</h1>
                 </div>
